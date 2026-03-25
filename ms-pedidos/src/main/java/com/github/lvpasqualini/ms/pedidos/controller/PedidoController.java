@@ -2,13 +2,13 @@ package com.github.lvpasqualini.ms.pedidos.controller;
 
 import com.github.lvpasqualini.ms.pedidos.dto.PedidoDTO;
 import com.github.lvpasqualini.ms.pedidos.services.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,4 +28,29 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoDTO);
     }
 
+    @PostMapping
+    public ResponseEntity<PedidoDTO> createPedido(@Valid @RequestBody PedidoDTO pedidoDTO) {
+        pedidoDTO = pedidoService.savePedido(pedidoDTO);
+
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{id}")
+                .buildAndExpand(pedidoDTO.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).body(pedidoDTO);
+    }
+
+    @PutMapping
+    public ResponseEntity<PedidoDTO> updatePedido(@Valid @PathVariable Long id, @RequestBody PedidoDTO pedidoDTO) {
+        PedidoDTO dto = pedidoService.updatePedido(id,pedidoDTO);
+
+        return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity deletePedido(@PathVariable Long id) {
+        pedidoService.deleteProduto(id);
+        return ResponseEntity.noContent().build();
+    }
 }
