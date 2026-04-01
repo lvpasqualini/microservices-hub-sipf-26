@@ -1,5 +1,6 @@
 package com.github.lvpasqualini.ms.pedidos.services;
 
+import com.github.lvpasqualini.ms.pedidos.controller.PedidoController;
 import com.github.lvpasqualini.ms.pedidos.dto.ItemPedidoDTO;
 import com.github.lvpasqualini.ms.pedidos.dto.PedidoDTO;
 import com.github.lvpasqualini.ms.pedidos.entities.ItemDoPedido;
@@ -54,7 +55,11 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Pedido com ID: " + id + " não encontrado")
         );
+        pedido.getItens().clear();
+        pedido.setData(LocalDate.now());
+        pedido.setStatus(Status.CRIADO);
         mapDtoToPedido(pedidoDTO,pedido);
+        pedido.calcularValorTotalPedido();
         pedido = pedidoRepository.save(pedido);
         return new PedidoDTO(pedido);
     }

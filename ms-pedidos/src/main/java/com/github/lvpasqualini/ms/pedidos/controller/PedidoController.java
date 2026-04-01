@@ -41,7 +41,7 @@ public class PedidoController {
         return ResponseEntity.created(uri).body(pedidoDTO);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<PedidoDTO> updatePedido(@Valid @PathVariable Long id, @RequestBody PedidoDTO pedidoDTO) {
         PedidoDTO dto = pedidoService.updatePedido(id,pedidoDTO);
 
@@ -49,7 +49,7 @@ public class PedidoController {
     }
 
     @DeleteMapping
-    public ResponseEntity deletePedido(@PathVariable Long id) {
+    public ResponseEntity<Void> deletePedido(@PathVariable Long id) {
         pedidoService.deleteProduto(id);
         return ResponseEntity.noContent().build();
     }
