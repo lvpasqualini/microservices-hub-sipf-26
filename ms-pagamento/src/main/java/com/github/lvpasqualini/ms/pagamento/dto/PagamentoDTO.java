@@ -31,7 +31,7 @@ public class PagamentoDTO {
     private String validade;
     @NotBlank(message = "O campo codigo de seguranca deve ser informado")
     @Size(min = 3, max = 3,message = "O codigo de seguranca deve ter 3 caracteres")
-    private String codigoSeguraca;
+    private String codigoSeguranca;
     private Status status;
     @NotNull(message = "O campo ID do pedido é obrigatorio")
     @Positive(message = "O campo ID deve ser positivo ou maior que zero")
@@ -43,7 +43,7 @@ public class PagamentoDTO {
         this.nome = pagamento.getNome();
         this.numeroCartao = pagamento.getNumeroCartao();
         this.validade = pagamento.getValidade();
-        this.codigoSeguraca = pagamento.getCodigoSeguraca();
+        this.codigoSeguranca = pagamento.getCodigoSeguranca();
         this.status = pagamento.getStatus();
         this.pedidoId = pagamento.getPedidoId();
     }

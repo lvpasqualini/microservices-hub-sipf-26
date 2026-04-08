@@ -25,7 +25,7 @@ public class Pagamento {
     @Column(nullable = false,length = 5)
     private String validade;
     @Column(nullable = false,length = 3)
-    private String codigoSeguraca;
+    private String codigoSeguranca;
     @Enumerated(EnumType.STRING)
     private Status status;
     @Column(nullable = false,length = 16)
