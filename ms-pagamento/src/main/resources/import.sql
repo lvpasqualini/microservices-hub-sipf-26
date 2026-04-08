@@ -1,0 +1,1 @@
+INSERT INTO tb_pagamento (valor,nome,numeroCartao,validade,codigoSeguranca,status,pedidoId) VALUES (20,'Lucas','123456789101','01/26','111','CRIADO',1);
