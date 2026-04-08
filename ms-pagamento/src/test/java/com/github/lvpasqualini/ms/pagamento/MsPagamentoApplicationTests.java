@@ -10,4 +10,5 @@ class MsPagamentoApplicationTests {
 	void contextLoads() {
 	}
 
+
 }
