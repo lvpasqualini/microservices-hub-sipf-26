@@ -207,6 +207,33 @@ public class PagamentoControllerTest {
     }
 
     @Test
+    void updatePagamentoShouldReturn200WhenValid() throws Exception {
+        PagamentoDTO requestDTO = new PagamentoDTO(Factory.createPagamentoSemId());
+        String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
+        PagamentoDTO responseDTO = new PagamentoDTO(pagamento);
+
+        Mockito.when(pagamentoService.update(eq(existingId), any(PagamentoDTO.class)))
+                .thenReturn(responseDTO);
+
+        mockMvc.perform(put("/pagamento/{id}", existingId)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequestBody))
+
+                // Verificação (Then)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(existingId))
+                .andExpect(jsonPath("$.status").value(pagamento.getStatus().name()))
+                .andExpect(jsonPath("$.pedidoId").value(pagamento.getPedidoId()))
+                .andExpect(jsonPath("$.nome").value(pagamento.getNome()));
+
+        Mockito.verify(pagamentoService).update(eq(existingId), any(PagamentoDTO.class));
+        Mockito.verifyNoMoreInteractions(pagamentoService);
+    }
+
+    @Test
     void deletePagamentoShouldReturn204WhenIdExists() throws Exception {
 
         // Configuração do Mock (Given)
