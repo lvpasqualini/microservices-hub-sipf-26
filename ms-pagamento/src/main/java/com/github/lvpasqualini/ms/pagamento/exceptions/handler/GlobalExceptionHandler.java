@@ -1,6 +1,7 @@
 package com.github.lvpasqualini.ms.pagamento.exceptions.handler;
 
 import com.github.lvpasqualini.ms.pagamento.exceptions.DatabaseException;
+import com.github.lvpasqualini.ms.pagamento.exceptions.PagamentoAprovadoException;
 import com.github.lvpasqualini.ms.pagamento.exceptions.ResourceNotFoundException;
 import com.github.lvpasqualini.ms.pagamento.exceptions.dto.CustomErrorDTO;
 import com.github.lvpasqualini.ms.pagamento.exceptions.dto.ValidationErrorDTO;
@@ -76,7 +77,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-    // 500 - fallback para qualquer erro não tratado
+    @ExceptionHandler(PagamentoAprovadoException.class)
+    public ResponseEntity<CustomErrorDTO> handlePagamentoAprovado(PagamentoAprovadoException e,
+                                                                  HttpServletRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT; //
+        CustomErrorDTO err = new CustomErrorDTO(Instant.now(), status.value(),
+                e.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(status).body(err);
+    }
+    //500 - fallback para qualquer erro não tratado
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<CustomErrorDTO> handleGenericException(Exception e,
 //                                                                 HttpServletRequest request) {

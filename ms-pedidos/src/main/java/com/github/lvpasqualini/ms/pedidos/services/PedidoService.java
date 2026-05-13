@@ -15,6 +15,7 @@ import com.github.lvpasqualini.ms.pedidos.exceptions.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,9 +56,14 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Pedido com ID: " + id + " não encontrado")
         );
+        if (pedido.getStatus().equals(Status.PAGO)) {
+            throw new PedidoPagoException(
+                    String.format("Pedido id: %d já está PAGO e não pode ser alterado", id)
+            );
+        }
         pedido.getItens().clear();
         pedido.setData(LocalDate.now());
-        pedido.setStatus(Status.CRIADO);
+        //pedido.setStatus(Status.CRIADO);
         mapDtoToPedido(pedidoDTO,pedido);
         pedido.calcularValorTotalPedido();
         pedido = pedidoRepository.save(pedido);
@@ -70,6 +76,18 @@ public class PedidoService {
             throw new ResourceNotFoundException("Pedido com ID: " + id + " não encontrado");
         }
         pedidoRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void confirmarPagamento(Long id) {
+        Optional<Pedido> pedido = pedidoRepository.findById(id);
+
+        if(pedido.isEmpty()) {
+            throw new ResourceNotFoundException("Pedido não encontrado com o ID: " + id);
+        }
+
+        pedido.get().setStatus(Status.PAGO);
+        pedidoRepository.save(pedido.get());
     }
 
     private void mapDtoToPedido(PedidoDTO pedidoDTO, Pedido pedido) {

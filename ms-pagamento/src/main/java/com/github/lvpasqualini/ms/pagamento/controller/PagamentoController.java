@@ -3,6 +3,7 @@ package com.github.lvpasqualini.ms.pagamento.controller;
 import com.github.lvpasqualini.ms.pagamento.dto.PagamentoDTO;
 import com.github.lvpasqualini.ms.pagamento.service.PagamentoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,13 @@ public class PagamentoController {
     public ResponseEntity<PagamentoDTO> update(@PathVariable Long id,@Valid @RequestBody PagamentoDTO pagamentoDTO) {
         pagamentoDTO = pagamentoService.update(id,pagamentoDTO);
         return ResponseEntity.ok(pagamentoDTO);
+    }
+
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<PagamentoDTO> confirmarPagamentoDoPedido(@PathVariable @NotNull Long id) {
+        PagamentoDTO dto = pagamentoService.confirmarPagamentoDoPedido(id);
+
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")

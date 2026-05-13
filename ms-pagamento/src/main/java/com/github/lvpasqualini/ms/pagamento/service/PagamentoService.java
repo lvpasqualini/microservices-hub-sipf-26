@@ -1,8 +1,10 @@
 package com.github.lvpasqualini.ms.pagamento.service;
 
+import com.github.lvpasqualini.ms.pagamento.client.PedidoClient;
 import com.github.lvpasqualini.ms.pagamento.dto.PagamentoDTO;
 import com.github.lvpasqualini.ms.pagamento.entities.Pagamento;
 import com.github.lvpasqualini.ms.pagamento.entities.Status;
+import com.github.lvpasqualini.ms.pagamento.exceptions.PagamentoAprovadoException;
 import com.github.lvpasqualini.ms.pagamento.exceptions.ResourceNotFoundException;
 import com.github.lvpasqualini.ms.pagamento.repositories.PagamentoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,12 +13,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PagamentoService {
     @Autowired
     private PagamentoRepository repository;
+
+    @Autowired
+    private PedidoClient pedidoClient;
 
     @Transactional(readOnly = true)
     public List<PagamentoDTO> findAll() {
@@ -44,6 +50,13 @@ public class PagamentoService {
     public PagamentoDTO update(Long id, PagamentoDTO pagamentoDTO) {
         try {
             Pagamento pagamento = repository.getReferenceById(id);
+
+            if (pagamento.getStatus().equals(Status.APROVADO)) {
+                throw new PagamentoAprovadoException(
+                        String.format("Pagamento id: %d já está APROVADO e não pode ser alterado", id)
+                );
+            }
+
             mapperDtoToPagamento(pagamentoDTO,pagamento);
             pagamento.setStatus(pagamentoDTO.getStatus());
             pagamento = repository.save(pagamento);
@@ -59,6 +72,18 @@ public class PagamentoService {
             throw new ResourceNotFoundException("Recurso não encontrado com o ID: "+ id);
         }
         repository.deleteById(id);
+    }
+
+    @Transactional
+    public PagamentoDTO confirmarPagamentoDoPedido(Long id) {
+        Pagamento pagamento = repository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Pagamento não encontrado com o ID: " +id)
+        );
+
+        pagamento.setStatus(Status.APROVADO);
+        repository.save(pagamento);
+        pedidoClient.confirmarPagamento(pagamento.getPedidoId());
+        return new PagamentoDTO(pagamento);
     }
 
 
